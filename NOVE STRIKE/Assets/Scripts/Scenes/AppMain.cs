@@ -25,6 +25,6 @@ public class AppMain : MonoBehaviour
 
     private void Update()
     {
-        SceneManager?.Update();
+        SceneManager?.SceneUpdate();
     }
 }

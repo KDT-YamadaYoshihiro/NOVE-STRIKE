@@ -113,7 +113,7 @@ public class GameSceneManager
     /// <summary>
     /// エントリーポイントから毎フレーム呼び出される更新処理
     /// </summary>
-    public void Update()
+    public void SceneUpdate()
     {
         // 最前面だけ
         m_currentScene?.OnSceneUpdate();
