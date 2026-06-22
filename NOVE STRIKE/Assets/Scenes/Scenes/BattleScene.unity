@@ -297,6 +297,7 @@ Transform:
   - {fileID: 674124692}
   - {fileID: 1268658895}
   - {fileID: 563388551}
+  - {fileID: 1436418956}
   - {fileID: 225779006}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -324,6 +325,7 @@ GameObject:
   - component: {fileID: 674124691}
   - component: {fileID: 674124690}
   - component: {fileID: 674124693}
+  - component: {fileID: 674124694}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -449,6 +451,52 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &674124694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674124689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a1596ef29b2bb7439c4dcbfa96e29e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownCameraController
+  m_targetPlayer: {fileID: 821730671}
+  m_cameraOffset: {x: 0, y: 15, z: -10}
+  m_smoothTime: 0.2
+--- !u!1 &682344752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 682344753}
+  m_Layer: 0
+  m_Name: BulletContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &682344753
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682344752}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: 2.77629, y: -0.89184, z: 12.42642}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1577336464}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &821730670
 GameObject:
   m_ObjectHideFlags: 0
@@ -637,6 +685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
   m_playerController: {fileID: 1577336465}
+  m_cameraController: {fileID: 674124694}
 --- !u!4 &1436418956
 Transform:
   m_ObjectHideFlags: 0
@@ -645,12 +694,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1436418954}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.95553, y: 0.5, z: -3.61975}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.5269599, y: 0.5, z: 7.80882}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 581450846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1577336463
 GameObject:
@@ -682,12 +731,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1577336463}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
   m_LocalPosition: {x: 5.15, y: 1.99, z: 6.08}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 821730671}
+  - {fileID: 682344753}
   m_Father: {fileID: 225779006}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &1577336465
@@ -707,8 +757,6 @@ MonoBehaviour:
   m_moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_aimAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_shootAction: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_firePoint: {fileID: 821730671}
-  m_bulletPrefab: {fileID: 6357355992721309038, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}
 --- !u!114 &1577336466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,6 +771,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombatPresenter
   m_bulletPrefab: {fileID: 6357355992721309038, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}
   m_firePoint: {fileID: 821730671}
+  m_bulletContainer: {fileID: 682344753}
 --- !u!54 &1577336467
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -897,4 +946,3 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 581450846}
-  - {fileID: 1436418956}

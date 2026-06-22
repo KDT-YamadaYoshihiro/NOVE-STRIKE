@@ -9,15 +9,11 @@ public class PlayerController : CharaBase
     [SerializeField] private InputActionReference m_aimAction;
     [SerializeField] private InputActionReference m_shootAction;
 
-    [Header("Combat References")]
-    [SerializeField] private Transform m_firePoint;
-    [SerializeField] private GameObject m_bulletPrefab;
+    private PlayerCombatPresenter m_combatPresenter;
 
     private Vector2 m_moveInput;
     private Vector2 m_aimInput;
     private bool m_isShooting;
-    private float m_nextTimeToFire;
-    private float m_fireRate = 0.2f;
 
     public PlayerStatus PlayerStatus => Status as PlayerStatus;
 
@@ -29,6 +25,7 @@ public class PlayerController : CharaBase
     public override void InitializeCharacter()
     {
         base.InitializeCharacter();
+        m_combatPresenter = GetComponent<PlayerCombatPresenter>();
         EnableInputActions();
     }
 
@@ -90,17 +87,10 @@ public class PlayerController : CharaBase
 
     private void TriggerWeaponFire()
     {
-        if (Time.time < m_nextTimeToFire) return;
-
-        m_nextTimeToFire = Time.time + m_fireRate;
-        ExecuteShoot();
-    }
-
-    private void ExecuteShoot()
-    {
-        if (m_bulletPrefab == null || m_firePoint == null) return;
-
-        Instantiate(m_bulletPrefab, m_firePoint.position, m_firePoint.rotation);
+        if (m_combatPresenter != null)
+        {
+            m_combatPresenter.OnShootInputPressed();
+        }
     }
 
     private void EnableInputActions()

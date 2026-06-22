@@ -15,10 +15,13 @@ public class BulletMover : MonoBehaviour
     public void InitializeMover(float arg_speed, Vector3 arg_direction)
     {
         m_rigidbody = GetComponent<Rigidbody>();
-        m_rigidbody.useGravity = false; // 弾に重力は適用しない
+        if(m_rigidbody != null)
+        {
+            m_rigidbody.useGravity = false; // 弾に重力は適用しない
+        }
 
         m_speed = arg_speed;
-        m_direction = arg_direction.normalized;
+        m_direction = arg_direction;
     }
 
     /// <summary>
@@ -26,7 +29,16 @@ public class BulletMover : MonoBehaviour
     /// </summary>
     public void TickFixedUpdate()
     {
-        // 水平方向（3D空間）への移動直線処理
-        m_rigidbody.linearVelocity = m_direction * m_speed;
+        if (m_rigidbody != null)
+        {
+            // 物理演算がスリープ状態（停止）になっていたら強制的に起こす
+            if (m_rigidbody.IsSleeping())
+            {
+                m_rigidbody.WakeUp();
+            }
+
+            // 速度を代入して移動させる
+            m_rigidbody.linearVelocity = m_direction * m_speed;
+        }
     }
 }
