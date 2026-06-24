@@ -1,4 +1,3 @@
-// PlayerController.cs
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +8,12 @@ public class PlayerController : CharaBase
     [SerializeField] private InputActionReference m_aimAction;
     [SerializeField] private InputActionReference m_shootAction;
 
+    // プレイヤーの戦闘プレゼンターへの参照
     private PlayerCombatPresenter m_combatPresenter;
+    // メインカメラへの参照
+    private Camera m_mainCamera;
+    // 入力デバイスがキーボードとマウスかどうかを判定するフラグ
+    private bool m_isKeyboardMouse;
 
     private Vector2 m_moveInput;
     private Vector2 m_aimInput;
@@ -26,6 +30,7 @@ public class PlayerController : CharaBase
     {
         base.InitializeCharacter();
         m_combatPresenter = GetComponent<PlayerCombatPresenter>();
+        m_mainCamera = Camera.main;
         EnableInputActions();
     }
 
@@ -38,15 +43,16 @@ public class PlayerController : CharaBase
     public void TickUpdate()
     {
         GatherInputValues();
+        DetectControlScheme();
 
         // 3D空間での回転（Y軸回転）
         if (m_aimInput.sqrMagnitude > 0.1f)
         {
-            RotatePlayer(m_aimInput);
+            RotateTowardsMouseCursor();
         }
         else if (m_moveInput.sqrMagnitude > 0.1f)
         {
-            RotatePlayer(m_moveInput);
+            RotateTowardsStickDirection();
         }
 
         if (m_isShooting)
@@ -67,6 +73,16 @@ public class PlayerController : CharaBase
         m_isShooting = m_shootAction.action.IsPressed();
     }
 
+    private void DetectControlScheme()
+    {
+        // 最初に入力があったデバイスを確認
+        var lastControl = m_aimAction.action.activeControl?.device;
+        if (lastControl != null)
+        {
+            m_isKeyboardMouse = lastControl is Keyboard || lastControl is Mouse;
+        }
+    }
+
     private void MovePlayer()
     {
         // 2DのVector2入力を、3D空間の水平面（X, Z）の動きに変換
@@ -76,13 +92,35 @@ public class PlayerController : CharaBase
         CachedRigidbody.linearVelocity = movement * Status.BaseMoveSpeed;
     }
 
-    private void RotatePlayer(Vector2 arg_direction)
+    // 【コントローラー用】スティックの入力方向を向く
+    private void RotateTowardsStickDirection()
     {
-        // 3D空間のY軸回転用の角度を計算（XとYの入力を、3DのXとZに対応させる）
-        float targetAngle = Mathf.Atan2(arg_direction.x, arg_direction.y) * Mathf.Rad2Deg;
+        if (m_moveInput.sqrMagnitude > 0.01f)
+        {
+            Vector3 direction = new Vector3(m_moveInput.x, 0f, m_moveInput.y);
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+    }
 
-        // Y軸を中心に回転させる
-        transform.rotation = Quaternion.AngleAxis(targetAngle, Vector3.up);
+    // 【キーマウ用】マウスカーソルのワールド位置を向く
+    private void RotateTowardsMouseCursor()
+    {
+        if (m_mainCamera == null) return;
+
+        Ray ray = m_mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, transform.position.y, 0f));
+
+        if (groundPlane.Raycast(ray, out float hitDistance))
+        {
+            Vector3 targetPoint = ray.GetPoint(hitDistance);
+            Vector3 direction = (targetPoint - transform.position).normalized;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude > 0.01f)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
+        }
     }
 
     private void TriggerWeaponFire()

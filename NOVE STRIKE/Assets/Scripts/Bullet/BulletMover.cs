@@ -17,7 +17,8 @@ public class BulletMover : MonoBehaviour
         m_rigidbody = GetComponent<Rigidbody>();
         if(m_rigidbody != null)
         {
-            m_rigidbody.useGravity = false; // 弾に重力は適用しない
+            // 弾に重力は適用しない
+            m_rigidbody.useGravity = false; 
         }
 
         m_speed = arg_speed;
