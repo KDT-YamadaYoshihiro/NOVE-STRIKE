@@ -15,7 +15,8 @@ public class PlayerStatus : CharaStatusModel
     /// </summary>
     /// <param name="arg_maxHealth"></param>
     /// <param name="arg_baseMoveSpeed"></param>
-    public PlayerStatus(float arg_maxHealth, float arg_baseMoveSpeed) : base(arg_maxHealth, arg_baseMoveSpeed)
+    public PlayerStatus(float arg_maxHealth, float arg_baseMoveSpeed) 
+        : base(arg_maxHealth, arg_baseMoveSpeed)
     {
     }
 
