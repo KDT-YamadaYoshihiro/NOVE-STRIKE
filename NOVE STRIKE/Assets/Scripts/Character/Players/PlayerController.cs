@@ -14,9 +14,9 @@ public class PlayerController : CharaBase
     private Camera m_mainCamera;
     // 入力デバイスがキーボードとマウスかどうかを判定するフラグ
     private bool m_isKeyboardMouse;
+    private Quaternion m_targetRotation = Quaternion.identity;
 
     private Vector2 m_moveInput;
-    private Vector2 m_aimInput;
     private bool m_isShooting;
 
     public PlayerStatus PlayerStatus => Status as PlayerStatus;
@@ -29,8 +29,14 @@ public class PlayerController : CharaBase
     public override void InitializeCharacter()
     {
         base.InitializeCharacter();
+
         m_combatPresenter = GetComponent<PlayerCombatPresenter>();
         m_mainCamera = Camera.main;
+
+        if (m_combatPresenter != null)
+        {
+            m_combatPresenter = GetComponent<PlayerCombatPresenter>();
+        }
         EnableInputActions();
     }
 
@@ -46,13 +52,13 @@ public class PlayerController : CharaBase
         DetectControlScheme();
 
         // 3D空間での回転（Y軸回転）
-        if (m_aimInput.sqrMagnitude > 0.1f)
+        if (m_isKeyboardMouse)
         {
-            RotateTowardsMouseCursor();
+            CalculateMouseCursorRotation();
         }
         else if (m_moveInput.sqrMagnitude > 0.1f)
         {
-            RotateTowardsStickDirection();
+            CalculateStickDirectionRotation();
         }
 
         if (m_isShooting)
@@ -63,49 +69,74 @@ public class PlayerController : CharaBase
 
     public void TickFixedUpdate()
     {
+        ApplyRotationPhysics();
         MovePlayer();
     }
 
     private void GatherInputValues()
     {
         m_moveInput = m_moveAction.action.ReadValue<Vector2>();
-        m_aimInput = m_aimAction.action.ReadValue<Vector2>();
         m_isShooting = m_shootAction.action.IsPressed();
     }
 
     private void DetectControlScheme()
     {
-        // 最初に入力があったデバイスを確認
-        var lastControl = m_aimAction.action.activeControl?.device;
-        if (lastControl != null)
+        InputControl activeControl = null;
+
+        if(m_moveAction.action.IsPressed())
         {
-            m_isKeyboardMouse = lastControl is Keyboard || lastControl is Mouse;
+            activeControl = m_moveAction.action.activeControl;
+        }
+        else if(m_shootAction.action.IsPressed())
+        {
+            activeControl = m_shootAction.action.activeControl;
+        }
+        else if(m_aimAction.action.IsPressed())
+        {
+            activeControl = m_aimAction.action.activeControl;
+        }
+
+        if (activeControl != null)
+        {
+            m_isKeyboardMouse = activeControl.device is Keyboard || activeControl.device is Mouse;
         }
     }
 
     private void MovePlayer()
     {
-        // 2DのVector2入力を、3D空間の水平面（X, Z）の動きに変換
-        Vector3 movement = new Vector3(m_moveInput.x, 0f, m_moveInput.y);
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 movement = (forward * m_moveInput.y) + (right * m_moveInput.x);
+
+        if (movement.sqrMagnitude > 1f)
+        {
+            movement.Normalize();
+        }
 
         // Unity 6推奨の3D用 linearVelocity を使用
         CachedRigidbody.linearVelocity = movement * Status.BaseMoveSpeed;
     }
 
     // 【コントローラー用】スティックの入力方向を向く
-    private void RotateTowardsStickDirection()
+    private void CalculateStickDirectionRotation()
     {
         if (m_moveInput.sqrMagnitude > 0.01f)
         {
             Vector3 direction = new Vector3(m_moveInput.x, 0f, m_moveInput.y);
-            transform.rotation = Quaternion.LookRotation(direction);
+            m_targetRotation = Quaternion.LookRotation(direction);
         }
     }
 
     // 【キーマウ用】マウスカーソルのワールド位置を向く
-    private void RotateTowardsMouseCursor()
+    private void CalculateMouseCursorRotation()
     {
-        if (m_mainCamera == null) return;
+        if (m_mainCamera == null || Mouse.current == null) { return; }
 
         Ray ray = m_mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, transform.position.y, 0f));
@@ -118,8 +149,16 @@ public class PlayerController : CharaBase
 
             if (direction.sqrMagnitude > 0.01f)
             {
-                transform.rotation = Quaternion.LookRotation(direction);
+                m_targetRotation = Quaternion.LookRotation(direction);
             }
+        }
+    }
+
+    private void ApplyRotationPhysics()
+    {
+        if(CachedRigidbody != null && m_targetRotation != Quaternion.identity)
+        {
+            CachedRigidbody.MoveRotation(m_targetRotation);
         }
     }
 
