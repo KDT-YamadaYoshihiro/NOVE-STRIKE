@@ -20,5 +20,5 @@ MonoBehaviour:
   AttackRange: 15
   AttackCooldown: 2
   MoveType: 0
-  AttackType: 0
+  AttackType: 1
   BulletPrefab: {fileID: 6357355992721309038, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}

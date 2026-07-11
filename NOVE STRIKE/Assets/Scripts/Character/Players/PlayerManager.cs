@@ -13,37 +13,11 @@ public class PlayerManager : MonoBehaviour
     private List<PlayerBullet> m_activeBullets = new List<PlayerBullet>();
     private PlayerCombatPresenter m_combatPresenter;
 
-    // Unity標準ライフサイクルの使用箇所をこのクラスに限定化する
-
-    private void Awake()
-    {
-        InitializeManager();
-    }
-
-    private void Update()
-    {
-        UpdateManager();
-    }
-
-    private void FixedUpdate()
-    {
-        FixedUpdateManager();
-    }
-
-    private void LateUpdate()
-    {
-        LateUpdateManager();
-    }
-
-    private void OnDestroy()
-    {
-        ReleaseManager();
-    }
 
     /// <summary>
     /// プレイヤーとカメラの初期化を行う
     /// </summary>
-    private void InitializeManager()
+    public void InitializeManager()
     {
         if (m_playerController != null)
         {
@@ -68,10 +42,8 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void UpdateManager()
+    public void TickUpdate(float arg_deltaTime)
     {
-
-        float deltaTime = Time.deltaTime;
 
         if (m_playerController != null)
         {
@@ -95,12 +67,12 @@ public class PlayerManager : MonoBehaviour
                 continue;
             }
             
-            bullet.TickUpdate(deltaTime);
+            bullet.TickUpdate(arg_deltaTime);
             
         }
     }
 
-    private void FixedUpdateManager()
+    public void TickFixedUpdate()
     {
         // プレイヤーの物理移動
         if (m_playerController != null)
@@ -119,15 +91,15 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void LateUpdateManager()
+    public void TickLateUpdate(float arg_deltaTime)
     {
         if (m_cameraController != null)
         {
-            m_cameraController.LateTickUpdate(Time.deltaTime);
+            m_cameraController.LateTickUpdate(arg_deltaTime);
         }
     }
 
-    private void ReleaseManager()
+    public void ReleaseManager()
     {
         if (m_playerController != null)
         {

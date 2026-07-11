@@ -21,25 +21,6 @@ public class EnemyManager : MonoBehaviour
     private EnemyFactory m_factory;
     private List<EnemyController> m_activeEnemies = new List<EnemyController>();
 
-    private void Awake()
-    {
-        InitializeManager();
-    }
-
-    void Update()
-    {
-        UpdateManager();
-
-        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            SpawnEnemy("mob", new Vector3(5f, 0f, 5f));
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        FixedUpdateManager();
-    }
 
     /// <summary>
     /// マネージャーとファクトリーの初期化
@@ -58,29 +39,33 @@ public class EnemyManager : MonoBehaviour
     /// <summary>
     /// 生きている全エネミーのUpdateを一括駆動
     /// </summary>
-    public void UpdateManager()
+    public void TickUpdate(float arg_deltaTime)
     {
-        float deltaTime = Time.deltaTime;
+        // 【デバッグ用】必要に応じて残すか削除
+        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            SpawnEnemy("mob", new Vector3(5f, 0f, 5f));
+        }
 
         // リストを後ろからループ
-        for(int i = m_activeEnemies.Count -1; i >= 0; i--)
+        for (int i = m_activeEnemies.Count -1; i >= 0; i--)
         {
             EnemyController enemy = m_activeEnemies[i];
 
             // エネミーが存在しない
-            if(enemy = null)
+            if(enemy == null)
             {
                 m_activeEnemies.RemoveAt(i);
                 continue;
             }
-            enemy.TickUpdate(deltaTime);
+            enemy.TickUpdate(arg_deltaTime);
         }
     }
 
     /// <summary>
     /// 生きている全エネミーのfixeUpdateを一括駆動
     /// </summary>
-    public void FixedUpdateManager()
+    public void TickFixedUpdate()
     {
         for (int i = m_activeEnemies.Count - 1; i >= 0; i--)
         {

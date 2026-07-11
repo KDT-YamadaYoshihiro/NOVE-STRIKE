@@ -144,7 +144,7 @@ Transform:
   m_GameObject: {fileID: 225779005}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.65942, y: -0.59816, z: 7.06071}
+  m_LocalPosition: {x: -1.6594198, y: -0.59816, z: 7.06071}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -293,6 +293,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1739744944}
   - {fileID: 674124692}
   - {fileID: 1268658895}
   - {fileID: 563388551}
@@ -316,6 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61ef5b910a0e9444da0daf12797ce987, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleScene
+  m_battleSystem: {fileID: 1739744943}
 --- !u!4 &607521868 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4642354897730996173, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
@@ -499,7 +501,7 @@ Transform:
   m_GameObject: {fileID: 682344752}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.71429014, y: 0.5, z: 0.71428967}
+  m_LocalPosition: {x: 0.7142899, y: 0.5, z: 0.71428967}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -769,7 +771,7 @@ Transform:
   m_GameObject: {fileID: 1436418954}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.5269599, y: 0.5, z: 7.80882}
+  m_LocalPosition: {x: -1.5269601, y: 0.5, z: 7.80882}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -832,6 +834,52 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 4.86936, y: 0.5, z: 6.8069797}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 581450846}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1739744942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1739744944}
+  - component: {fileID: 1739744943}
+  m_Layer: 0
+  m_Name: BattleSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1739744943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1739744942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4af70bbc0e37f854da113d494cfefcae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleSystem
+  m_playerManager: {fileID: 1436418955}
+  m_enemyManager: {fileID: 1991244736}
+--- !u!4 &1739744944
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1739744942}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 5.8880997, y: 0.5, z: 10.3421}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

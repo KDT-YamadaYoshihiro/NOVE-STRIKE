@@ -17,4 +17,7 @@ public abstract class SceneBase : MonoBehaviour
 
     // 毎フレームの更新処理
     public abstract void OnSceneUpdate();
+    public abstract void OnSceneFixedUpdate();
+    public abstract void OnSceneLateUpdate();
+
 }

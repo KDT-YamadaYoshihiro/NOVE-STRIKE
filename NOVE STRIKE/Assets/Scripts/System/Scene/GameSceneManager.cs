@@ -118,4 +118,20 @@ public class GameSceneManager
         // 最前面だけ
         m_currentScene?.OnSceneUpdate();
     }
+
+    /// <summary>
+    /// 物理演算用更新メソッド
+    /// </summary>
+    public void SceneFixedUpdate()
+    {
+        m_currentScene?.OnSceneFixedUpdate();
+    }
+    
+    /// <summary>
+    /// カメラ・事後処理用
+    /// </summary>
+    public void SceneLateUpdate()
+    {
+        m_currentScene?.OnSceneLateUpdate();
+    }
 }
