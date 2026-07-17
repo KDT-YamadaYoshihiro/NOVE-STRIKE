@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d48f851bf82512948aea64a149b55125, type: 3}
-  m_Name: EnemyData
+  m_Name: EnemyData 1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   EnemyID: mob
-  BasePrefab: {fileID: 2067906631422097128, guid: e5099d46b1013fd4a8c9b86467b08d93, type: 3}
+  BasePrefab: {fileID: 2067906631422097128, guid: 6ed7e1062be624641b5ac5e89e914203, type: 3}
   MaxHealth: 100
   MoveSpeed: 3
   AttackPower: 10
   AttackRange: 15
   AttackCooldown: 2
-  MoveType: 2
-  AttackType: 0
+  MoveType: 1
+  AttackType: 2
   BulletPrefab: {fileID: 6357355992721309038, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}

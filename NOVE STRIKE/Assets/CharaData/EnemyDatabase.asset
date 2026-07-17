@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDatabase
   EnemyList:
   - {fileID: 11400000, guid: 580fafa1ec41feb46bb7087ab23aba42, type: 2}
+  - {fileID: 11400000, guid: bf1a1319947632e4a9ffd9ba2be4f3df, type: 2}
+  - {fileID: 11400000, guid: f0aba1f07e9d42a43b4f2473be7a2ee0, type: 2}
