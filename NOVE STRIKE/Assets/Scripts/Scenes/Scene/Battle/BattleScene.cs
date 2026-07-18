@@ -3,17 +3,20 @@ using UnityEngine;
 public class BattleScene : SceneBase
 {
 
-    [Header("Systems")]
-    [Tooltip("このシーンのメインシステム")]
-    [SerializeField] private BattleSystem m_battleSystem;
+    private BattleSystem m_battleSystem;
+
+    [Header("Managers")]
+    [SerializeField] private PlayerManager m_playerManager;
+    [SerializeField] private EnemyManager m_enemyManager;
+
 
     public override void Initialize()
     {
         Debug.Log("BattleScene: 初期化");
-
+        m_battleSystem = new BattleSystem();
         if (m_battleSystem != null)
         {
-            m_battleSystem.InitializeSystem();
+            m_battleSystem.InitializeSystem(m_playerManager, m_enemyManager);
         }
     }
 
