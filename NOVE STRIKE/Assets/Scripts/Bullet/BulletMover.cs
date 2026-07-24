@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class BulletMover : MonoBehaviour
 {
     private Rigidbody m_rigidbody;
     private float m_speed;
-    private Vector3 m_direction; 
+    private Vector3 m_direction;
+
+    public event Action<Collider> OnTriggerEntered;
 
     /// <summary>
     /// 初期化
@@ -41,5 +44,14 @@ public class BulletMover : MonoBehaviour
             // 速度を代入して移動させる
             m_rigidbody.linearVelocity = m_direction * m_speed;
         }
+    }
+
+    /// <summary>
+    /// 衝突判定イベント
+    /// </summary>
+    /// <param name="arg_other"></param>
+    private void OnTriggerEnter(Collider arg_other)
+    {
+        OnTriggerEntered?.Invoke(arg_other);
     }
 }

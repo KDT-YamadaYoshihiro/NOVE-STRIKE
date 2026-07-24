@@ -3,7 +3,6 @@ using UnityEngine;
 /// <summary>
 ///  インターフェース
 /// </summary>
-
 public interface IEnemyMoveBehavior
 {
     void ExecuteMove(CharaBase arg_selfController, Transform arg_targetTransform, float arg_moveSpeed);
@@ -17,7 +16,6 @@ public interface IEnemyAttackBehavior
 /// <summary>
 /// 移動アルゴリズム
 /// </summary>
-
 public class MoveBehaviorStationary : IEnemyMoveBehavior
 {
     public void ExecuteMove(CharaBase arg_selfController, Transform arg_targetTransform,float arg_moveSpeed)
@@ -33,6 +31,9 @@ public class MoveBehaviorStationary : IEnemyMoveBehavior
     }
 }
 
+/// <summary>
+/// 追尾アルゴリズム
+/// </summary>
 public class MoveBehaviorChase : IEnemyMoveBehavior
 {
 
@@ -50,7 +51,9 @@ public class MoveBehaviorChase : IEnemyMoveBehavior
     }
 }
 
-
+/// <summary>
+/// 単発攻撃アルゴリズム
+/// </summary>
 public class AttackBehaviorSingle : IEnemyAttackBehavior
 {
     private readonly GameObject m_bulletPrefab;
@@ -65,24 +68,24 @@ public class AttackBehaviorSingle : IEnemyAttackBehavior
     public void ExecuteAttack(CharaBase arg_selfController, Transform arg_targetTransform, EnemyStatus arg_status, BulletOwnerType arg_ownerType)
     {
         Transform firePoint = arg_selfController.FirePoint;
-        if (m_bulletPrefab == null || firePoint == null) return;
+        if (m_bulletPrefab == null || firePoint == null) { return; }
+
+        Vector3 shootDirection = (arg_targetTransform.position - firePoint.position).normalized;
+        shootDirection.y = 0f;
 
         GameObject bulletObject = m_bulletContainer != null
             ? Object.Instantiate(m_bulletPrefab, firePoint.position, firePoint.rotation, m_bulletContainer)
             : Object.Instantiate(m_bulletPrefab, firePoint.position, firePoint.rotation);
 
-        PlayerBullet bullet = bulletObject.GetComponent<PlayerBullet>();
-        if (bullet != null)
-        {
-            Vector3 shootDirection = (arg_targetTransform.position - firePoint.position).normalized;
-            shootDirection.y = 0f;
+        BulletData data = new BulletData(
+                        arg_status.AttackPower, // ステータスの攻撃力を付与！
+                        15f,
+                        5f,
+                        arg_ownerType,
+                        shootDirection
+                    );
 
-            BulletData data = new BulletData(arg_status.AttackPower, 15f, 5f, arg_ownerType, shootDirection);
-            bullet.InitializeBullet(data);
-        }
-        else
-        {
-            Object.Destroy(bulletObject);
-        }
+        // 純粋C#クラスとして new で生み出し、GameObjectとデータを紐づける
+        Bullet bullet = new Bullet(bulletObject, data);
     }
 }

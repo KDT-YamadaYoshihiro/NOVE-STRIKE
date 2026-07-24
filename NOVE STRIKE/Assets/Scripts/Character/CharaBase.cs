@@ -8,6 +8,8 @@ public abstract class CharaBase : MonoBehaviour, IDamageable
     // インスペクター（GUI）でのみ設定可能、外部スクリプトからは完全非公開（安全）
     [SerializeField] private float m_defaultMaxHealth = 100f;
     [SerializeField] private float m_defaultBaseMoveSpeed = 5f;
+    [SerializeField] private float m_defaultAttackPower = 10f;
+    [SerializeField] private float m_defaultDefensePower = 0f;
 
     [SerializeField] private Transform m_firePoint;
 
@@ -19,7 +21,8 @@ public abstract class CharaBase : MonoBehaviour, IDamageable
     // 子クラスが初期値を利用できるようにするためのプロパティ（カプセル化の維持）
     protected float DefaultMaxHealth => m_defaultMaxHealth;
     protected float DefaultBaseMoveSpeed => m_defaultBaseMoveSpeed;
-
+    protected float DefaultAttackPower => m_defaultAttackPower;
+    protected float DefaultDefensePower => m_defaultDefensePower;
     public virtual void InitializeCharacter()
     {
         CachedRigidbody = GetComponent<Rigidbody>();
@@ -47,7 +50,6 @@ public abstract class CharaBase : MonoBehaviour, IDamageable
 
     // 抽象メソッド（子クラスにStatusModelの構築を強制）
     protected abstract void SetupStatusModel();
-
 
     /// <summary>
     /// 物理移動の共通処理

@@ -23,7 +23,7 @@ public class PlayerController : CharaBase
 
     protected override void SetupStatusModel()
     {
-        Status = new PlayerStatus(DefaultMaxHealth, DefaultBaseMoveSpeed);
+        Status = new PlayerStatus(DefaultMaxHealth, DefaultBaseMoveSpeed, DefaultAttackPower, DefaultDefensePower);
     }
 
     public override void InitializeCharacter()
@@ -59,11 +59,6 @@ public class PlayerController : CharaBase
         else if (m_moveInput.sqrMagnitude > 0.1f)
         {
             CalculateStickDirectionRotation();
-        }
-
-        if (m_isShooting)
-        {
-            TriggerWeaponFire();
         }
     }
 
@@ -159,14 +154,6 @@ public class PlayerController : CharaBase
         if(CachedRigidbody != null && m_targetRotation != Quaternion.identity)
         {
             CachedRigidbody.MoveRotation(m_targetRotation);
-        }
-    }
-
-    private void TriggerWeaponFire()
-    {
-        if (m_combatPresenter != null)
-        {
-            m_combatPresenter.OnShootInputPressed();
         }
     }
 

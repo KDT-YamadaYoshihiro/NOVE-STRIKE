@@ -9,6 +9,8 @@ public abstract class CharaStatusModel
     public float MaxHealth { get; protected set; }
     public float CurrentHealth { get; protected set; }
     public float BaseMoveSpeed { get; protected set; }
+    public float AttackPower { get; protected set; }
+    public float DefensePower { get; protected set; }
 
     /// <summary>
     /// 共有イベント
@@ -21,11 +23,13 @@ public abstract class CharaStatusModel
     /// </summary>
     /// <param name="arg_maxHealth"></param>
     /// <param name="arg_baseMoveSpeed"></param>
-    protected CharaStatusModel(float arg_maxHealth, float arg_baseMoveSpeed)
+    protected CharaStatusModel(float arg_maxHealth, float arg_baseMoveSpeed, float arg_attackPower, float arg_defensePower)
     {
         MaxHealth = arg_maxHealth;
         CurrentHealth = arg_maxHealth;
         BaseMoveSpeed = arg_baseMoveSpeed;
+        AttackPower = arg_attackPower;
+        DefensePower = arg_defensePower;
     }
 
     /// <summary>
@@ -36,10 +40,12 @@ public abstract class CharaStatusModel
     {
         if (CurrentHealth <= 0) { return; }
 
-        CurrentHealth -= arg_damage;
+        // ダメージ計算：攻撃力 - 防御力（最低1ダメージは保証する）
+        float actualDamage = Mathf.Max(arg_damage - DefensePower, 1f);
+
+        CurrentHealth -= actualDamage;
         CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, MaxHealth);
 
-        // 変更をView（UI等）に通知
         OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
 
         if (CurrentHealth <= 0)
@@ -59,13 +65,5 @@ public abstract class CharaStatusModel
         CurrentHealth += arg_amount;
         CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, MaxHealth);
         OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private void ExecuteDeath()
-    {
-        OnDeath?.Invoke();
     }
 }

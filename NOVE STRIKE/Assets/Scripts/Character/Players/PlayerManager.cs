@@ -10,7 +10,7 @@ public class PlayerManager : MonoBehaviour
     [Header("Camera Reference")]
     [SerializeField] private TopDownCameraController m_cameraController;
 
-    private List<PlayerBullet> m_activeBullets = new List<PlayerBullet>();
+    private List<Bullet> m_activeBullets = new List<Bullet>();
     private PlayerCombatPresenter m_combatPresenter;
 
 
@@ -37,7 +37,7 @@ public class PlayerManager : MonoBehaviour
 
         if (m_combatPresenter != null)
         {
-            m_combatPresenter.InitializeCombat();
+            m_combatPresenter.InitializeCombat(m_playerController.PlayerStatus);
             m_combatPresenter.OnBulletSpawned += HandleBulletSpawned;
         }
     }
@@ -47,28 +47,28 @@ public class PlayerManager : MonoBehaviour
 
         if (m_playerController != null)
         {
-            // プレイヤーのUpdateルーチンを毎フレーム手動呼び出し
             m_playerController.TickUpdate();
         }
 
-        // プレイヤーの戦闘処理のUpdateルーチンを毎フレーム手動呼び出し
         if (m_combatPresenter != null)
         {
-            m_combatPresenter.TickUpdate();
+            m_combatPresenter.TickUpdate(arg_deltaTime);
         }
 
-        // 弾丸の更新を一括駆動
-        for(int i = m_activeBullets.Count - 1; i >= 0; i--)
+        // プールの回収・更新処理
+        for (int i = m_activeBullets.Count - 1; i >= 0; i--)
         {
-            PlayerBullet bullet = m_activeBullets[i];
+            Bullet bullet = m_activeBullets[i];
+
+            // 寿命や衝突で死んだらプールに帰す
             if (bullet.IsDead)
             {
+                m_combatPresenter.Pool.ReturnToPool(bullet);
                 m_activeBullets.RemoveAt(i);
                 continue;
             }
-            
+
             bullet.TickUpdate(arg_deltaTime);
-            
         }
     }
 
@@ -83,7 +83,7 @@ public class PlayerManager : MonoBehaviour
         // 弾丸のFixedUpdateを一括駆動
         for (int i = m_activeBullets.Count - 1; i >= 0; i--)
         {
-            PlayerBullet bullet = m_activeBullets[i];
+            Bullet bullet = m_activeBullets[i];
             if (bullet != null && !bullet.IsDead)
             {
                 bullet.TickFixedUpdate();
@@ -118,7 +118,7 @@ public class PlayerManager : MonoBehaviour
     /// <summary>
     /// 弾が生成された時に呼び出され、一括管理リストに登録するメソッド
     /// </summary>
-    private void HandleBulletSpawned(PlayerBullet arg_newBullet)
+    private void HandleBulletSpawned(Bullet arg_newBullet)
     {
         if (arg_newBullet != null)
         {
