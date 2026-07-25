@@ -7,15 +7,20 @@ public class EnemyController : CharaBase
 
     public EnemyStatus EnemyStatus => Status as EnemyStatus;
 
+    /// <summary>
+    /// 初期設定
+    /// </summary>
     protected override void SetupStatusModel()
     {
-        // 直接シーンに置かれた場合のエラー回避用ダミーデータ
-        Status = new EnemyStatus(10f, 1f, 1f, 1f, 1f);
+        Status = new EnemyStatus(10f, 1f, 1f, 0f, 1f, 1f);
     }
 
     /// <summary>
-    /// Factoryから呼び出され、データとAI部品を注入して自身を構築する
+    /// 初期化
     /// </summary>
+    /// <param name="arg_data"></param>
+    /// <param name="arg_moveBehavior"></param>
+    /// <param name="arg_attackBehavior"></param>
     public void InitializeEnemy(EnemyData arg_data, IEnemyMoveBehavior arg_moveBehavior, IEnemyAttackBehavior arg_attackBehavior)
     {
         base.InitializeCharacter();
@@ -26,6 +31,7 @@ public class EnemyController : CharaBase
             arg_data.MaxHealth,
             arg_data.MoveSpeed,
             arg_data.AttackPower,
+            arg_data.DefensePower,
             arg_data.AttackRange,
             arg_data.AttackCooldown
         );
@@ -38,18 +44,53 @@ public class EnemyController : CharaBase
         );
     }
 
+    /// <summary>
+    /// 更新処理
+    /// </summary>
+    /// <param name="arg_deltaTime"></param>
     public void TickUpdate(float arg_deltaTime)
     {
         m_aiPresenter?.TickUpdate(arg_deltaTime);
     }
 
+    /// <summary>
+    /// 計算系更新
+    /// </summary>
     public void TickFixedUpdate()
     {
         m_aiPresenter?.TickFixedUpdate();
     }
 
+    /// <summary>
+    /// ターゲット設定
+    /// </summary>
+    /// <param name="arg_playerTransform"></param>
     public void SetTarget(Transform arg_playerTransform)
     {
         m_aiPresenter?.SetTarget(arg_playerTransform);
+    }
+
+    /// <summary>
+    /// ターゲットとの物理的接触通知
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (m_aiPresenter != null && m_aiPresenter.IsTarget(collision.transform))
+        {
+            m_aiPresenter.SetTargetContact(true);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionExit(Collision collision)
+    {
+        if (m_aiPresenter != null && m_aiPresenter.IsTarget(collision.transform))
+        {
+            m_aiPresenter.SetTargetContact(false);
+        }
     }
 }

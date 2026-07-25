@@ -537,8 +537,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 803910676892646816, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
       propertyPath: m_Interpolate
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2010835306432768748, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
+      propertyPath: m_bulletPrefab
+      value: 
+      objectReference: {fileID: 3120094804375092638, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}
     - target: {fileID: 2010835306432768748, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
       propertyPath: m_bulletContainer
       value: 

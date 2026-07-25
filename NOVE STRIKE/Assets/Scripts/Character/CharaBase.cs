@@ -27,10 +27,22 @@ public abstract class CharaBase : MonoBehaviour, IDamageable
     {
         CachedRigidbody = GetComponent<Rigidbody>();
 
-        // 3Dトップダウン特有の設定（勝手に転倒するのを防ぎ、重力を切るか制御する）
+        // 衝突による押し出しなどが「瞬間移動」に見えるのを防ぐ
+        CachedRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
+        // 深いめり込みが発生した際、PhysXが1ステップで引き剥がそうとする速度に上限をかける。
+        // プロジェクト既定値（Default Max Depenetration Velocity = 10）のままだと、
+        // 一瞬の深いめり込みが「瞬間移動」に見えるほど強く補正されてしまう。
+        CachedRigidbody.maxDepenetrationVelocity = 1f;
+
+        // Discreteのままだと、速度によっては衝突判定が間に合わず
+        // 一瞬コライダー同士が深くめり込む（トンネリング）ことがある。
+        // Continuous Dynamicに変更し、めり込みの発生自体を抑える。
+        CachedRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
         CachedRigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         CachedRigidbody.useGravity = false;
-
+        
         // 具体的なModelの生成を子クラスに行わせる
         SetupStatusModel();
 

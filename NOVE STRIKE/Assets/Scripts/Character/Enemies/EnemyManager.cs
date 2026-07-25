@@ -21,6 +21,8 @@ public class EnemyManager : MonoBehaviour
     private EnemyFactory m_factory;
     private List<EnemyController> m_activeEnemies = new List<EnemyController>();
 
+    // エネミーが撃った弾とその返却先プールをセットで管理するリスト
+    private List<(Bullet bullet, BulletPool pool)> m_activeBullets = new List<(Bullet, BulletPool)>();
 
     /// <summary>
     /// マネージャーとファクトリーの初期化
@@ -33,7 +35,7 @@ public class EnemyManager : MonoBehaviour
             return;
         }
 
-        m_factory = new EnemyFactory(m_enemyDatabase, m_enemyBulletContainer);
+        m_factory = new EnemyFactory(m_enemyDatabase, m_enemyBulletContainer, HandleEnemyBulletSpawned);
     }
 
     /// <summary>
@@ -41,24 +43,37 @@ public class EnemyManager : MonoBehaviour
     /// </summary>
     public void TickUpdate(float arg_deltaTime)
     {
-        // 【デバッグ用】必要に応じて残すか削除
         if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
         {
             SpawnEnemy("mob", new Vector3(5f, 0f, 5f));
         }
 
-        // リストを後ろからループ
-        for (int i = m_activeEnemies.Count -1; i >= 0; i--)
+        // ▼ エネミー本体の更新
+        for (int i = m_activeEnemies.Count - 1; i >= 0; i--)
         {
             EnemyController enemy = m_activeEnemies[i];
-
-            // エネミーが存在しない
-            if(enemy == null)
+            if (enemy == null)
             {
                 m_activeEnemies.RemoveAt(i);
                 continue;
             }
             enemy.TickUpdate(arg_deltaTime);
+        }
+
+        // ▼ エネミーが撃った弾のプール回収と更新処理
+        for (int i = m_activeBullets.Count - 1; i >= 0; i--)
+        {
+            var item = m_activeBullets[i];
+
+            // 寿命や衝突で死んだら、元のプールに帰す
+            if (item.bullet.IsDead)
+            {
+                item.pool.ReturnToPool(item.bullet);
+                m_activeBullets.RemoveAt(i);
+                continue;
+            }
+
+            item.bullet.TickUpdate(arg_deltaTime);
         }
     }
 
@@ -70,10 +85,13 @@ public class EnemyManager : MonoBehaviour
         for (int i = m_activeEnemies.Count - 1; i >= 0; i--)
         {
             EnemyController enemy = m_activeEnemies[i];
-            if(enemy != null)
-            {
-                enemy.TickFixedUpdate();
-            }
+            if (enemy != null) enemy.TickFixedUpdate();
+        }
+
+        for (int i = m_activeBullets.Count - 1; i >= 0; i--)
+        {
+            var item = m_activeBullets[i];
+            if (!item.bullet.IsDead) item.bullet.TickFixedUpdate();
         }
     }
 
@@ -126,5 +144,13 @@ public class EnemyManager : MonoBehaviour
                 enemy.SetTarget(m_playerTarget);
             }
         }
+    }
+
+    /// <summary>
+    /// Factory経由でエネミーが弾を撃った際に呼ばれるコールバック
+    /// </summary>
+    private void HandleEnemyBulletSpawned(Bullet arg_bullet, BulletPool arg_pool)
+    {
+        m_activeBullets.Add((arg_bullet, arg_pool));
     }
 }

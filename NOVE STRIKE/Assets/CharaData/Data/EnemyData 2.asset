@@ -15,10 +15,10 @@ MonoBehaviour:
   EnemyID: mob
   BasePrefab: {fileID: 2067906631422097128, guid: 45f63324b4182244f933d5fb1bf18b4b, type: 3}
   MaxHealth: 100
-  MoveSpeed: 3
+  MoveSpeed: 10
   AttackPower: 10
+  DefensePower: 0
   AttackRange: 15
   AttackCooldown: 2
-  MoveType: 0
-  AttackType: 3
-  BulletPrefab: {fileID: 6357355992721309038, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}
+  IsKamikaze: 0
+  BulletPrefab: {fileID: 3120094804375092638, guid: 6d13bf8dbfa351242acdede93a0cb4a0, type: 3}

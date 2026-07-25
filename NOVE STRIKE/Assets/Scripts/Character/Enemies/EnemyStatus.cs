@@ -1,17 +1,12 @@
-using UnityEngine;
-
 public class EnemyStatus : CharaStatusModel
 {
-    public float AttackPower { get; private set; }
     public float AttackRange { get; private set; }
-    public float AttackCooldown {  get; private set; }
-
+    public float AttackCooldown { get; private set; }
     public float CurrentCooldownTimer { get; private set; }
 
-    public EnemyStatus(float arg_maxHealth, float arg_baseMoveSpeed, float arg_attackPower, float arg_attackRange, float arg_cooldown)
-        :base(arg_maxHealth,arg_baseMoveSpeed)
+    public EnemyStatus(float arg_maxHealth, float arg_baseMoveSpeed, float arg_attackPower, float arg_defensePower, float arg_attackRange, float arg_cooldown)
+        : base(arg_maxHealth, arg_baseMoveSpeed, arg_attackPower, arg_defensePower)
     {
-        AttackPower = arg_attackPower;
         AttackRange = arg_attackRange;
         AttackCooldown = arg_cooldown;
         CurrentCooldownTimer = 0f;
@@ -19,7 +14,7 @@ public class EnemyStatus : CharaStatusModel
 
     public void TickCooldown(float arg_deltaTime)
     {
-        if(CurrentCooldownTimer > 0f)
+        if (CurrentCooldownTimer > 0f)
         {
             CurrentCooldownTimer -= arg_deltaTime;
         }
