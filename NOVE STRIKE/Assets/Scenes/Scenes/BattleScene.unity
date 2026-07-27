@@ -537,7 +537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 803910676892646816, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2010835306432768748, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
       propertyPath: m_bulletPrefab
@@ -547,6 +547,10 @@ PrefabInstance:
       propertyPath: m_bulletContainer
       value: 
       objectReference: {fileID: 682344753}
+    - target: {fileID: 2010835306432768748, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
+      propertyPath: m_enemyLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6550879996070859929, guid: 383c7b6427e8bad4d9416ba7764f2515, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 

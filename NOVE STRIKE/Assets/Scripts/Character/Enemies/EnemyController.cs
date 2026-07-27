@@ -69,28 +69,4 @@ public class EnemyController : CharaBase
     {
         m_aiPresenter?.SetTarget(arg_playerTransform);
     }
-
-    /// <summary>
-    /// ターゲットとの物理的接触通知
-    /// </summary>
-    /// <param name="collision"></param>
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (m_aiPresenter != null && m_aiPresenter.IsTarget(collision.transform))
-        {
-            m_aiPresenter.SetTargetContact(true);
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="collision"></param>
-    private void OnCollisionExit(Collision collision)
-    {
-        if (m_aiPresenter != null && m_aiPresenter.IsTarget(collision.transform))
-        {
-            m_aiPresenter.SetTargetContact(false);
-        }
-    }
 }
