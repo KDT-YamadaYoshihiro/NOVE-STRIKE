@@ -104,3 +104,18 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Claude Code 運用スクリプトの生成ログ
+.claude/scripts/*.log
+
+# --- NOVE STRIKE 用の追加ルール ---
+# Unity プロジェクトがリポジトリ直下ではなく "NOVE STRIKE/" 配下にあるため、
+# 上記のルート固定パターン(/[Ll]ibrary/ など)がマッチしない。任意階層で無視する。
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+[Rr]ecordings/
