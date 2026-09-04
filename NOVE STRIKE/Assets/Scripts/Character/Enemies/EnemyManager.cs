@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class EnemyManager : MonoBehaviour
 {
@@ -43,11 +42,6 @@ public class EnemyManager : MonoBehaviour
     /// </summary>
     public void TickUpdate(float arg_deltaTime)
     {
-        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            SpawnEnemy("mob", new Vector3(5f, 0f, 5f));
-        }
-
         // ▼ エネミー本体の更新
         for (int i = m_activeEnemies.Count - 1; i >= 0; i--)
         {

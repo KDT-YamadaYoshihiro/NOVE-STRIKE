@@ -20,6 +20,16 @@ MonoBehaviour:
     MainPathIndex: 3
   - Type: 2
     MainPathIndex: 99
+  EnemyTable:
+  - EnemyID: mob_weak
+    Weight: 3
+  - EnemyID: mob_normal
+    Weight: 2
+  - EnemyID: mob_fast
+    Weight: 1
+  ObstaclePrefabs:
+  - {fileID: 6686341025957773180, guid: 283055cf2384718478c9152c413db434, type: 3}
+  ChestPrefab: {fileID: 3546393719304363655, guid: 47ceed7af32e520498aa44a230831174, type: 3}
   BattleRooms:
   - {fileID: 11400000, guid: fca6142b1d391f046ac0c4c2266ea1c1, type: 2}
   TreasureRooms:

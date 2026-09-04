@@ -14,7 +14,7 @@ public class FloorBuilder
     private readonly Transform m_parent;
 
     // 配置済みの部屋オブジェクト。破棄と参照解決に使う
-    private readonly Dictionary<RoomPlacement, RoomDefinition> m_spawned = new Dictionary<RoomPlacement, RoomDefinition>();
+    private readonly Dictionary<RoomPlacement, RoomRuntime> m_spawned = new Dictionary<RoomPlacement, RoomRuntime>();
 
     public FloorBuilder(RoomGridSettings arg_gridSettings, Transform arg_parent)
     {
@@ -25,7 +25,7 @@ public class FloorBuilder
     /// <summary>
     /// 配置済みの部屋。key はレイアウト上の部屋
     /// </summary>
-    public IReadOnlyDictionary<RoomPlacement, RoomDefinition> SpawnedRooms => m_spawned;
+    public IReadOnlyDictionary<RoomPlacement, RoomRuntime> SpawnedRooms => m_spawned;
 
     /// <summary>
     /// レイアウトに従って全部屋を配置する
@@ -60,10 +60,10 @@ public class FloorBuilder
     /// </summary>
     public void Clear()
     {
-        foreach (KeyValuePair<RoomPlacement, RoomDefinition> pair in m_spawned)
+        foreach (KeyValuePair<RoomPlacement, RoomRuntime> pair in m_spawned)
         {
-            if (pair.Value == null) { continue; }
-            Object.Destroy(pair.Value.gameObject);
+            if (pair.Value == null || pair.Value.Definition == null) { continue; }
+            Object.Destroy(pair.Value.Definition.gameObject);
         }
         m_spawned.Clear();
     }
@@ -92,7 +92,7 @@ public class FloorBuilder
             return false;
         }
 
-        m_spawned[arg_placement] = definition;
+        m_spawned[arg_placement] = new RoomRuntime(arg_placement, definition);
         return true;
     }
 }
