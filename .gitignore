@@ -119,3 +119,8 @@ InitTestScene*.unity*
 [Ll]ogs/
 [Mm]emoryCaptures/
 [Rr]ecordings/
+
+# アセットストアのインストーラ書庫。中身は Assets/ 配下へ展開済みで参照されるため
+# バージョン管理は不要。GitHub の 100MB 制限も超えるため必ず除外する。
+*.unitypackage
+*.unitypackage.meta
