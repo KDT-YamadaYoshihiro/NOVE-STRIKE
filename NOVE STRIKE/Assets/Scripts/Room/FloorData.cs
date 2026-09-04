@@ -2,10 +2,27 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
+/// 本道から枝分かれさせる部屋の配置指定
+/// </summary>
+/// <remarks>
+/// 宝箱部屋・休憩部屋は本道から1部屋だけ生える行き止まりとして配置する。
+/// 位置を固定することで、回復や補給のタイミングが運に左右されないようにする。
+/// </remarks>
+[System.Serializable]
+public class BranchRoomPlacement
+{
+    [Tooltip("枝道に置く部屋の種別")]
+    public RoomType Type = RoomType.Treasure;
+
+    [Tooltip("分岐元となる本道の部屋番号(0始まり)。本道の部屋数を超える場合は末尾側へ丸める")]
+    public int MainPathIndex = 3;
+}
+
+/// <summary>
 /// 1フロアの構成を定義するデータ
 /// </summary>
 /// <remarks>
-/// 部屋数や各種部屋の出現数はここでのみ決める。生成側に数値を持たせない。
+/// 部屋数や枝道の位置はここでのみ決める。生成側に数値を持たせない。
 /// </remarks>
 [CreateAssetMenu(fileName = "NewFloorData", menuName = "Game/Floor Data")]
 public class FloorData : ScriptableObject
@@ -13,11 +30,13 @@ public class FloorData : ScriptableObject
     [Header("Basic Info (基本情報)")]
     public string FloorID;
 
-    [Header("Room Count (部屋数)")]
-    [Tooltip("1ランで通過する部屋数の下限(ボス部屋を含む)")] public int MinRoomCount = 8;
-    [Tooltip("1ランで通過する部屋数の上限(ボス部屋を含む)")] public int MaxRoomCount = 12;
-    [Tooltip("宝箱部屋の出現数")] public int TreasureRoomCount = 1;
-    [Tooltip("休憩部屋の出現数")] public int RestRoomCount = 1;
+    [Header("Main Path (本道)")]
+    [Tooltip("本道の部屋数の下限(ボス部屋を含む)")] public int MinRoomCount = 8;
+    [Tooltip("本道の部屋数の上限(ボス部屋を含む)")] public int MaxRoomCount = 12;
+
+    [Header("Branch Rooms (枝道の部屋)")]
+    [Tooltip("本道から生やす行き止まりの部屋。位置は固定する")]
+    public List<BranchRoomPlacement> BranchRooms = new List<BranchRoomPlacement>();
 
     [Header("Room Pools (部屋の抽選プール)")]
     public List<RoomData> BattleRooms = new List<RoomData>();
@@ -27,6 +46,9 @@ public class FloorData : ScriptableObject
 
     [Header("Grid (グリッド規格)")]
     public RoomGridSettings GridSettings;
+
+    [Header("Generation (生成)")]
+    [Tooltip("配置に失敗したときに最初からやり直す最大回数")] public int MaxBuildRetryCount = 20;
 
     /// <summary>
     /// 種別に対応する抽選プールを返す
@@ -45,9 +67,12 @@ public class FloorData : ScriptableObject
     }
 
     /// <summary>
-    /// 重み付き抽選で部屋を1つ選ぶ。選べない場合は null
+    /// 指定方向すべてにドアを持つ部屋を、重み付き抽選で1つ選ぶ
     /// </summary>
-    public RoomData PickRoom(RoomType arg_type)
+    /// <param name="arg_type">部屋の種別</param>
+    /// <param name="arg_requiredDirections">必ずドアが必要な方向</param>
+    /// <returns>条件を満たす部屋。見つからない場合は null</returns>
+    public RoomData PickRoom(RoomType arg_type, IReadOnlyList<RoomDirection> arg_requiredDirections)
     {
         // ボス部屋は抽選せず固定
         if (arg_type == RoomType.Boss) { return BossRoom; }
@@ -59,30 +84,64 @@ public class FloorData : ScriptableObject
             return null;
         }
 
-        int totalWeight = 0;
+        // 必要な方向のドアを持たない部屋を候補から外す
+        List<RoomData> candidates = new List<RoomData>();
         foreach (RoomData room in pool)
         {
             if (room == null) { continue; }
-            totalWeight += Mathf.Max(1, room.Weight);
+            if (HasRequiredDoors(room, arg_requiredDirections)) { candidates.Add(room); }
         }
 
-        if (totalWeight <= 0)
+        if (candidates.Count == 0)
         {
-            Debug.LogError($"[{name}] 種別 {arg_type} の抽選プールに有効な部屋がありません。");
+            Debug.LogError($"[{name}] 種別 {arg_type} に、必要な方向のドアを持つ部屋がありません。部屋プレハブのドア構成を見直してください。");
             return null;
         }
 
-        int value = Random.Range(0, totalWeight);
-        foreach (RoomData room in pool)
-        {
-            if (room == null) { continue; }
+        return PickByWeight(candidates);
+    }
 
+    /// <summary>
+    /// 必要な方向すべてにドアがあるかを判定する
+    /// </summary>
+    private static bool HasRequiredDoors(RoomData arg_room, IReadOnlyList<RoomDirection> arg_requiredDirections)
+    {
+        if (arg_requiredDirections == null || arg_requiredDirections.Count == 0) { return true; }
+
+        RoomDefinition definition = arg_room.GetDefinition();
+        if (definition == null)
+        {
+            Debug.LogError($"[{arg_room.name}] プレハブに RoomDefinition が付いていません。");
+            return false;
+        }
+
+        foreach (RoomDirection direction in arg_requiredDirections)
+        {
+            if (!definition.HasDoor(direction)) { return false; }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 重み付き抽選で1つ選ぶ
+    /// </summary>
+    private static RoomData PickByWeight(List<RoomData> arg_candidates)
+    {
+        int totalWeight = 0;
+        foreach (RoomData room in arg_candidates)
+        {
+            totalWeight += Mathf.Max(1, room.Weight);
+        }
+
+        int value = Random.Range(0, totalWeight);
+        foreach (RoomData room in arg_candidates)
+        {
             value -= Mathf.Max(1, room.Weight);
             if (value < 0) { return room; }
         }
 
         // 重みの合計計算と抽選がずれた場合の保険
-        return pool[pool.Count - 1];
+        return arg_candidates[arg_candidates.Count - 1];
     }
 
 #if UNITY_EDITOR
@@ -93,11 +152,26 @@ public class FloorData : ScriptableObject
             Debug.LogWarning($"[{name}] MinRoomCount が MaxRoomCount を超えています。", this);
         }
 
-        // ボス部屋と、種別ごとの必要数を差し引いても戦闘部屋が残るかを確認する
-        int reserved = 1 + TreasureRoomCount + RestRoomCount;
-        if (reserved > MinRoomCount)
+        // 本道はボス部屋と開始部屋を含むため、最低2部屋は必要
+        if (MinRoomCount < 2)
         {
-            Debug.LogWarning($"[{name}] ボス・宝箱・休憩の合計 {reserved} 部屋が MinRoomCount({MinRoomCount}) を超えています。戦闘部屋が配置されません。", this);
+            Debug.LogWarning($"[{name}] 本道は開始部屋とボス部屋で最低2部屋必要です。", this);
+        }
+
+        foreach (BranchRoomPlacement branch in BranchRooms)
+        {
+            if (branch == null) { continue; }
+
+            // ボス部屋は本道の終端に固定されるため、枝道には置けない
+            if (branch.Type == RoomType.Boss || branch.Type == RoomType.Battle)
+            {
+                Debug.LogWarning($"[{name}] 枝道に置けるのは宝箱部屋と休憩部屋のみです。({branch.Type})", this);
+            }
+
+            if (branch.MainPathIndex < 0)
+            {
+                Debug.LogWarning($"[{name}] MainPathIndex に負の値が指定されています。", this);
+            }
         }
     }
 #endif
