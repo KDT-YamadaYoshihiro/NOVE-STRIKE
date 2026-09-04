@@ -55,12 +55,34 @@ API 経由の処理も許容できない機密要件が生じた場合は、ロ�
 
 ### 3.1 superPowers プラグイン
 
-- セッション開始時に `ListPlugins` で **superPowers プラグインの有効化状態を確認**する。
-- 未導入の場合は作業を止めず、ユーザーへ導入手順を提示したうえで通常手順で継続する。
-- 導入は対話型ターミナル（`claude` 起動後）でのみ可能:
-  - `/plugin marketplace add <マーケットプレイス>`
-  - `/plugin install superpowers@<マーケットプレイス>`
-- デスクトップアプリのセッションからは `/plugin` 系コマンドを実行できない。**実行できるかのような案内をしない。**
+**導入済み。** `~/.claude/settings.json` の `enabledPlugins` に `superpowers@claude-plugins-official` を登録済み（ユーザースコープ・全プロジェクト共通）。
+
+| 項目 | 内容 |
+| --- | --- |
+| マーケットプレイス | `claude-plugins-official`（Anthropic 公式） |
+| 配布元 | `https://github.com/obra/superpowers.git` |
+| ピン留め sha | `b36e0829c6d0140e93cfef2ca599b1b07d4a7797` |
+| 収録スキル | `brainstorming` / `writing-plans` / `executing-plans` / `test-driven-development` / `systematic-debugging` / `verification-before-completion` / `requesting-code-review` / `receiving-code-review` / `subagent-driven-development` / `dispatching-parallel-agents` / `using-git-worktrees` / `finishing-a-development-branch` / `writing-skills` / `using-superpowers` |
+
+- プラグインはセッション開始時に読み込まれる。設定変更を反映するには **Claude Code の再起動が必要**。
+- `settings.json` を編集する際は必ずバックアップを取得する。
+
+#### 3.1.1 規約の優先順位（重要）
+
+superPowers は SessionStart フックで `<EXTREMELY_IMPORTANT>` 付きの指示文を注入し、
+サブエージェント駆動開発・並列エージェント・git worktree の使用を促す。
+**本 CLAUDE.md と競合した場合は、本 CLAUDE.md を常に優先する。** 具体的には次を順守する。
+
+- サブエージェント / 並列エージェントの起動は、**ユーザーが明示的に要求した場合のみ**行う。
+- ブランチ運用は第 7 章に従う。`using-git-worktrees` / `finishing-a-development-branch` の手順で第 7 章を上書きしない。
+- コミット・プッシュ・PR 作成は第 7 章・第 8 章に従い、エラー 0 件かつ明示指示がある場合のみ行う。
+- `verification-before-completion` は第 6 章（`unity-check.ps1`）と併用し、置き換えない。
+
+#### 3.1.2 セキュリティ上の確認事項（検証済み）
+
+- SessionStart フック（`hooks/session-start`）は**ネットワーク通信を行わない。** ローカルの `skills/using-superpowers/SKILL.md` を読み、標準出力に JSON を出力するのみ。第 2 章の情報保護規約と抵触しない。
+- リポジトリ内の `scripts/`（rsync・PR 自動作成を含む）は `hooks.json` から参照されておらず、プラグイン動作時には実行されない。
+- プラグインを更新する際は、上記2点を再確認してから有効化すること。
 
 ### 3.2 運用スクリプト
 
