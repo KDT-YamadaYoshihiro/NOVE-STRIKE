@@ -1,0 +1,128 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerManager : MonoBehaviour
+{
+    [Header("Player Reference")]
+    [SerializeField] private PlayerController m_playerController;
+
+    [Header("Camera Reference")]
+    [SerializeField] private TopDownCameraController m_cameraController;
+
+    private List<Bullet> m_activeBullets = new List<Bullet>();
+    private PlayerCombatPresenter m_combatPresenter;
+
+
+    /// <summary>
+    /// プレイヤーとカメラの初期化を行う
+    /// </summary>
+    public void InitializeManager()
+    {
+        if (m_playerController != null)
+        {
+            // プレイヤー全体の初期化処理を明示的に実行
+            m_playerController.InitializeCharacter();
+            m_combatPresenter = m_playerController.GetComponent<PlayerCombatPresenter>();
+            // カメラの初期化処理を明示的に実行
+            if (m_cameraController != null)
+            {
+                m_cameraController.InitializeCamera(m_playerController.transform);
+            }
+        }
+        else
+        {
+            Debug.LogError("PlayerControllerがPlayerManagerにアタッチされていません。");
+        }
+
+        if (m_combatPresenter != null)
+        {
+            m_combatPresenter.InitializeCombat(m_playerController.PlayerStatus);
+            m_combatPresenter.OnBulletSpawned += HandleBulletSpawned;
+        }
+    }
+
+    public void TickUpdate(float arg_deltaTime)
+    {
+
+        if (m_playerController != null)
+        {
+            m_playerController.TickUpdate();
+        }
+
+        if (m_combatPresenter != null)
+        {
+            m_combatPresenter.TickUpdate(arg_deltaTime);
+        }
+
+        // プールの回収・更新処理
+        for (int i = m_activeBullets.Count - 1; i >= 0; i--)
+        {
+            Bullet bullet = m_activeBullets[i];
+
+            // 寿命や衝突で死んだらプールに帰す
+            if (bullet.IsDead)
+            {
+                m_combatPresenter.Pool.ReturnToPool(bullet);
+                m_activeBullets.RemoveAt(i);
+                continue;
+            }
+
+            bullet.TickUpdate(arg_deltaTime);
+        }
+    }
+
+    public void TickFixedUpdate()
+    {
+        // プレイヤーの物理移動
+        if (m_playerController != null)
+        {
+            m_playerController.TickFixedUpdate();
+        }
+
+        // 弾丸のFixedUpdateを一括駆動
+        for (int i = m_activeBullets.Count - 1; i >= 0; i--)
+        {
+            Bullet bullet = m_activeBullets[i];
+            if (bullet != null && !bullet.IsDead)
+            {
+                bullet.TickFixedUpdate();
+            }
+        }
+    }
+
+    public void TickLateUpdate(float arg_deltaTime)
+    {
+        if (m_cameraController != null)
+        {
+            m_cameraController.LateTickUpdate(arg_deltaTime);
+        }
+    }
+
+    public void ReleaseManager()
+    {
+        if (m_playerController != null)
+        {
+            m_playerController.ReleaseCharacter();
+        }
+
+        if (m_combatPresenter != null)
+        {
+            m_combatPresenter.ReleaseCombat();
+            m_combatPresenter.OnBulletSpawned -= HandleBulletSpawned;
+        }
+
+        m_activeBullets.Clear();
+    }
+
+    /// <summary>
+    /// 弾が生成された時に呼び出され、一括管理リストに登録するメソッド
+    /// </summary>
+    private void HandleBulletSpawned(Bullet arg_newBullet)
+    {
+        if (arg_newBullet != null)
+        {
+            m_activeBullets.Add(arg_newBullet);
+        }
+    }
+}

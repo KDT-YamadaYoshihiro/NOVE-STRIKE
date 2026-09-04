@@ -29,15 +29,6 @@ public class TitleScene : SceneBase
 
     public override void OnSceneUpdate()
     {
-        //if (Input.GetKeyDown(KeyCode.JoystickButton0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-        //{
-        //    Debug.Log("Aボタンが押されました。メインゲームへ遷移します。");
-
-        //    // タイトルはもう使わないので、現在のタイトルシーンを閉じてゲームシーンを開く
-        //    // スタックを入れ替える（タイトルを消してゲームを積む）挙動
-        //    Manager.CloseScene();
-        //    Manager.OpenScene<BattleScene>();
-        //}
 
         // デバッグ用：スペースキーが押されたらBattleSceneへ遷移する
         if(Keyboard.current.spaceKey.isPressed)
@@ -53,15 +44,23 @@ public class TitleScene : SceneBase
         }
     }
 
+    public override void OnSceneFixedUpdate()
+    { 
+    }
+
+    public override void OnSceneLateUpdate()
+    { 
+    }
+
     public override void Suspend()
     {
         // タイトルの上に何か重なる場合、UIを非活性にするなどの処理
-        if (m_uiInstance != null) m_uiInstance.SetActive(false);
+        if (m_uiInstance != null) { m_uiInstance.SetActive(false); }
     }
 
     public override void Resume()
     {
-        if (m_uiInstance != null) m_uiInstance.SetActive(true);
+        if (m_uiInstance != null) { m_uiInstance.SetActive(true); }
     }
 
     public override void Terminate()
