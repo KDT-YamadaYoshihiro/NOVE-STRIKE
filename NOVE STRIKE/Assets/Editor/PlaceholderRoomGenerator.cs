@@ -78,6 +78,17 @@ public static class PlaceholderRoomGenerator
         floor.RestRooms = new List<RoomData> { arg_rest };
         floor.BossRoom = arg_boss;
 
+        // EnemyDatabase に登録済みの敵IDを出現テーブルに並べる
+        floor.EnemyTable = new List<EnemySpawnEntry>
+        {
+            new EnemySpawnEntry { EnemyID = "mob_weak", Weight = 3 },
+            new EnemySpawnEntry { EnemyID = "mob_normal", Weight = 2 },
+            new EnemySpawnEntry { EnemyID = "mob_fast", Weight = 1 },
+        };
+
+        floor.ObstaclePrefabs = new List<GameObject> { CreatePropPrefab("Prop_Obstacle", new Vector3(2f, 2f, 2f)) };
+        floor.ChestPrefab = CreatePropPrefab("Prop_Chest", new Vector3(1.5f, 1f, 1f));
+
         // 宝箱は中盤、休憩はボス手前に固定する
         floor.BranchRooms = new List<BranchRoomPlacement>
         {
@@ -87,6 +98,25 @@ public static class PlaceholderRoomGenerator
 
         if (isNew) { AssetDatabase.CreateAsset(floor, path); }
         else { EditorUtility.SetDirty(floor); }
+    }
+
+    /// <summary>
+    /// 障害物や宝箱の仮プレハブを作る
+    /// </summary>
+    /// <remarks>
+    /// 見た目は立方体のみ。配置ロジックの検証が目的で、作り込みはフェーズ8で行う。
+    /// </remarks>
+    private static GameObject CreatePropPrefab(string arg_name, Vector3 arg_scale)
+    {
+        string path = $"{PrefabFolder}/{arg_name}.prefab";
+
+        GameObject source = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        source.name = arg_name;
+        source.transform.localScale = arg_scale;
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(source, path);
+        Object.DestroyImmediate(source);
+        return prefab;
     }
 
     // ------------------------------------------------------------

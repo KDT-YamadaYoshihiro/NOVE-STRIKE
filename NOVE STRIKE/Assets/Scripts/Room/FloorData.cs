@@ -2,6 +2,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
+/// フロアに出現する敵と、その出やすさ
+/// </summary>
+[System.Serializable]
+public class EnemySpawnEntry
+{
+    [Tooltip("EnemyDatabase に登録されている敵ID")]
+    public string EnemyID;
+
+    [Tooltip("抽選の重み。大きいほど出やすい")]
+    public int Weight = 1;
+}
+
+/// <summary>
 /// 本道から枝分かれさせる部屋の配置指定
 /// </summary>
 /// <remarks>
@@ -37,6 +50,16 @@ public class FloorData : ScriptableObject
     [Header("Branch Rooms (枝道の部屋)")]
     [Tooltip("本道から生やす行き止まりの部屋。位置は固定する")]
     public List<BranchRoomPlacement> BranchRooms = new List<BranchRoomPlacement>();
+
+    [Header("Enemy Table (敵の出現テーブル)")]
+    [Tooltip("このフロアに出現する敵と、その出やすさ。部屋ごとの敵はここから抽選する")]
+    public List<EnemySpawnEntry> EnemyTable = new List<EnemySpawnEntry>();
+
+    [Header("Props (小物)")]
+    [Tooltip("障害物として配置するプレハブの候補")]
+    public List<GameObject> ObstaclePrefabs = new List<GameObject>();
+    [Tooltip("宝箱として配置するプレハブ")]
+    public GameObject ChestPrefab;
 
     [Header("Room Pools (部屋の抽選プール)")]
     public List<RoomData> BattleRooms = new List<RoomData>();
@@ -156,6 +179,11 @@ public class FloorData : ScriptableObject
         if (MinRoomCount < 2)
         {
             Debug.LogWarning($"[{name}] 本道は開始部屋とボス部屋で最低2部屋必要です。", this);
+        }
+
+        if (EnemyTable == null || EnemyTable.Count == 0)
+        {
+            Debug.LogWarning($"[{name}] 敵の出現テーブルが空です。戦闘部屋に敵が配置されません。", this);
         }
 
         foreach (BranchRoomPlacement branch in BranchRooms)
